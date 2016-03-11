@@ -1,0 +1,8 @@
+.file-render{
+  overflow-x: auto;
+  width: 500px;
+  display: inline-block;
+}
+.marginado{
+  margin-left: 5px;
+}
