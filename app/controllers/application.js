@@ -6,10 +6,8 @@ export default Ember.Controller.extend({
       this.set('fileList', files);
     },
     listOfObjects(objs){
+      console.log(objs);
       this.set('listOfObjects', objs);
-    },
-    save(){
-      console.log(this.get('fileList'), this.get('listOfObjects'));
     }
   }
 });

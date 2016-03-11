@@ -25,5 +25,10 @@ export default Ember.Component.extend({
 
       this.get('listOfObjects')(this.get('objectList'));
     }
+  },
+  actions: {
+    save(){
+      this.get('listOfObjects')(this.get('objectList'));
+    }
   }
 });
