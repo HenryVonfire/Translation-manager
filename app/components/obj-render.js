@@ -3,6 +3,12 @@ import Ember from 'ember';
 export default Ember.Component.extend({
   classNames:['marginado'],
   path: '',
+  numberOfKeys: Ember.computed(function(){
+    return Object.keys(this.get('obj'));
+  }),
+  renderObj:Ember.computed('numberOfKeys',function(){
+    return this.get('obj');
+  }),
   didReceiveAttrs(){
     this.set('keyList',Object.keys(this.get('obj')));
     const path = this.get('path');
@@ -18,6 +24,7 @@ export default Ember.Component.extend({
     },
     removeKey(path, key, objectIndex){
       this.get('removeKey')(path, key, objectIndex);
+      this.set('numberOfKeys',Object.keys(this.get('obj')));
     }
   }
 });

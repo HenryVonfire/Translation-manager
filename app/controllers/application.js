@@ -58,12 +58,14 @@ export default Ember.Controller.extend({
     },
     removeKey(path, key, objectIndex){
       const pathArray = path.split('.');
-      let obj = this.get('objectList')[objectIndex];
-      for(let i=0;i<pathArray.length;i++){
-        obj = obj[pathArray[i]];
+      let obj = this.get('objectList');
+      for(let j=0;j<obj.length;j++){
+        let innerObj = obj[j];
+        for(let i=0;i<pathArray.length;i++){
+          innerObj = innerObj[pathArray[i]];
+        }
+        delete innerObj[key];
       }
-      delete obj[key];
     }
-
   }
 });
