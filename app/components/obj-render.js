@@ -13,8 +13,11 @@ export default Ember.Component.extend({
     }
   },
   actions: {
-    save(path,key,value,e){
-      console.log(path, key,value,e);
+    save(path,key,value,objectIndex,newValue){
+      this.get('save')(path, key,value,objectIndex,newValue);
+    },
+    removeKey(path, key, objectIndex){
+      this.get('removeKey')(path, key, objectIndex);
     }
   }
 });

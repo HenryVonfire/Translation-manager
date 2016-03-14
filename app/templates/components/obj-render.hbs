@@ -1,14 +1,23 @@
 {{#each-in obj as |key value|}}
   {{#if (is-object (get-object-from-key obj key))}}
     <b>{{key}}:</b><br>
-    {{obj-render obj=(get-object-from-key obj key) path=path lastKey=key}}
+    {{obj-render
+      obj=(get-object-from-key obj key)
+      objectIndex=objectIndex
+      path=path
+      lastKey=key
+      save=attrs.save
+      removeKey=attrs.removeKey}}
   {{else}}
     <div class="input-group">
       <span class="input-group-addon">{{key}}</span>
       {{one-way-input
       class="form-control"
       value=value
-      update=(action 'save' path key value)}}
+      update=(action 'save' path key value objectIndex)}}
+      <span class="input-group-btn">
+        <button class="btn btn-flat btn-danger"{{action 'removeKey' path key objectIndex}}>-</button>
+     </span>
     </div>
   {{/if}}
 {{/each-in}}
