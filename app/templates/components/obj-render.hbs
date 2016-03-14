@@ -1,13 +1,25 @@
 {{#each-in renderObj as |key value|}}
   {{#if (is-object (get-object-from-key renderObj key))}}
-    <b>{{key}}:</b><br>
+    <b>{{key}}:</b>
+    <div class="input-group">
+    {{one-way-input
+    class="form-control"
+    placeholder="add new key"
+    value=inputValue
+    update=(action (mut inputValue))}}
+    <span class="input-group-btn">
+      <button class="btn btn-flat btn-primary"{{action 'addKey' path key inputValue objectIndex}}>+</button>
+    </span>
+  </div>
+    <br>
     {{obj-render
       obj=(get-object-from-key renderObj key)
       objectIndex=objectIndex
       path=path
       lastKey=key
       save=attrs.save
-      removeKey=attrs.removeKey}}
+      removeKey=attrs.removeKey
+      addKey=attrs.addKey}}
   {{else}}
     <div class="input-group">
       <span class="input-group-addon">{{key}}</span>

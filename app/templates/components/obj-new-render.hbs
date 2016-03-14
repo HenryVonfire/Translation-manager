@@ -1,0 +1,44 @@
+<b>{{path}}</b><br>
+{{#each obj as |item|}}
+  {{#if item.isNotObject}}
+  <form class="form-inline">
+    <div class="form-group col-sm-2">
+      <span>{{item.key}}</span>
+    </div>
+    <div class="col-sm-10">
+      {{#if item.value0}}
+      <div class="form-group">
+        {{one-way-input
+        class="form-control input-medium"
+        value=item.value0
+        update=(action 'save' item)}}
+        </div>
+      {{/if}}
+      {{#if item.value1}}
+      <div class="form-group">
+        {{one-way-input
+        class="form-control input-medium"
+        value=item.value1
+        update=(action 'save' item)}}
+        </div>
+      {{/if}}
+      {{#if item.value2}}
+      <div class="form-group">
+        {{one-way-input
+        class="form-control input-medium"
+        value=item.value2
+        update=(action 'save' item)}}
+        </div>
+      {{/if}}
+
+      <div class="form-group">
+         <button class="btn btn-flat btn-danger"{{action 'removeKey' item}}>-</button>
+      </div>
+    </div>
+    </form>
+  {{else}}
+    {{obj-new-render obj=item
+    save=(action 'save')
+    removeKey=(action 'removeKey')}}<br>
+  {{/if}}
+{{/each}}

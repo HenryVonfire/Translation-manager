@@ -6,7 +6,7 @@ export default Ember.Component.extend({
   numberOfKeys: Ember.computed(function(){
     return Object.keys(this.get('obj'));
   }),
-  renderObj:Ember.computed('numberOfKeys',function(){
+  renderObj:Ember.computed('numberOfKeys.[]',function(){
     return this.get('obj');
   }),
   didReceiveAttrs(){
@@ -24,7 +24,11 @@ export default Ember.Component.extend({
     },
     removeKey(path, key, objectIndex){
       this.get('removeKey')(path, key, objectIndex);
-      this.set('numberOfKeys',Object.keys(this.get('obj')));
+
+    },
+    addKey(path, key, inputValue, objectIndex){
+      this.get('addKey')(path, key, inputValue, objectIndex);
+      this.set('inputValue','');
     }
   }
 });
