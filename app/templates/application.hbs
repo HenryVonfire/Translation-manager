@@ -1,6 +1,12 @@
-<button class="btn btn-flat btn-warning" {{action 'openFile'}}>Open File</button>
-<button class="btn btn-flat btn-primary" {{action 'saveFile'}}>Save</button>
-<hr>
+<div class="header-menu">
+  <div class="btn-group" role="group" aria-label="Basic example">
+  <button class="btn btn-flat btn-warning" {{action 'openFile'}}>Open File</button>
+  <button class="btn btn-flat btn-primary" {{action 'saveFile'}}>Save</button>
+</div>
+
+
+</div>
+<br><br><br>
 
 {{#if renderList}}
 <div class="file-render">

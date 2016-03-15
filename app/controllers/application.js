@@ -5,35 +5,42 @@ const fs = require('fs');
 
 export default Ember.Controller.extend({
   objectList:[],
-  numberOfObjects: Ember.computed('objectList.[]', function() {
+  numberOfFiles: Ember.computed('objectList.[]', function() {
     return this.get('objectList').length;
   }),
+
   _conversor(obj, path){
     let newObj = [];
-    for (let i in obj[0]){
-      if (obj[0].hasOwnProperty(i)) {
-        if(typeof obj[0][i] === 'object'){
-          let tmpPath;
-          if(!path){
-            tmpPath = i;
-          } else {
-            tmpPath = path + '.' + i;
-          }
+    let numberOfFiles = obj.length;
+    // obj will have at least one file and the rest should be the same because it
+    // has no sense to have translation files with different set of keys
+    const firstObj = obj[0];
+    for (let i in firstObj){
+      if (firstObj.hasOwnProperty(i)) {
+        if(typeof firstObj[i] === 'object'){
+          // if it's an object it means it's not a node leaf. Let's extract the path
+          let tmpPath = !path? i : path+'.'+i;
+
+          // saving the same node of the different files...
           let tmp = [];
-          for (var j = 0; j < obj.length; j++) {
+          for (var j = 0; j < numberOfFiles; j++) {
             tmp.pushObject(obj[j][i]);
           }
-          newObj.pushObject(this._conversor(tmp, tmpPath));
+          newObj.pushObject({
+            isLeaf: false, // boolean
+            path: tmpPath, // String
+            children:this._conversor(tmp, tmpPath) // array
+          });
         } else {
-          let item = {
-            path: path,
-            isNotObject:true,
-            key:i
-          };
-          for(var j = 0; j < obj.length; j++){
-            item['value'+j] = obj[j][i];
+          let value = [];
+          for(var j = 0; j < numberOfFiles; j++){
+            value.pushObject(obj[j][i]);
           }
-          newObj.pushObject(item);
+          newObj.pushObject({
+            isLeaf: true, // boolean
+            key:i,        // string
+            value: value  // array
+          });
         }
       }
     }
@@ -45,28 +52,6 @@ export default Ember.Controller.extend({
     this.set('renderList',newObj);
   },
 
-  _removeFromRenderObj(item, list){
-    list.forEach(element => {
-      if(!element.isNotObject){
-        if(element.indexOf(item) !== -1){
-          element.removeObject(item);
-        } else {
-          this._removeFromRenderObj(item, element);
-        }
-      }
-    });
-  },
-
-  _removeFromOriginalObj(pathArray, item){
-    let objectList = this.get('objectList');
-    for (let i=0;i<objectList.length;i++){
-      let innerObj = objectList[i];
-      for(let j=0;j<pathArray.length;j++){
-        innerObj = innerObj[pathArray[j]];
-      }
-      delete innerObj[item.key];
-    }
-  },
   actions: {
     //FILE ACTIONS..............................................................
     openFile(){
@@ -107,11 +92,11 @@ export default Ember.Controller.extend({
     },
 
     // OBJECT ACTIONS...........................................................
-    save(item,objectIndex,newValue){
-      const pathArray = item.path.split('.');
+    save(path,item,objectIndex,newValue){
+      const pathArray = path? path.split('.') : [];
       if(objectIndex === -1){
-        let obj = this.get('objectList');
-        obj.forEach(element => {
+        let objectList = this.get('objectList');
+        objectList.forEach(element => {
           for(let i=0;i<pathArray.length;i++){
             element = element[pathArray[i]];
           }
@@ -121,38 +106,43 @@ export default Ember.Controller.extend({
         });
         Ember.set(item,'key',newValue);
       } else {
-        let obj = this.get('objectList')[objectIndex];
+        let objectList = this.get('objectList')[objectIndex];
         for(let i=0;i<pathArray.length;i++){
-          obj = obj[pathArray[i]];
+          objectList = objectList[pathArray[i]];
         }
-        obj[item.key] = newValue;
-        Ember.set(item,'value',newValue);
+        objectList[item.key] = newValue;
+        item.value[objectIndex] = newValue;
       }
     },
 
-    removeKey(item){
+    removeKey(path, obj, item){
       // deleting from original objects...
-      this._removeFromOriginalObj(item.path.split('.'), item);
+      const pathArray = path? path.split('.') : [];
+      let objectList = this.get('objectList');
+      for (let i=0;i<objectList.length;i++){
+        let innerObj = objectList[i];
+        for(let j=0;j<pathArray.length;j++){
+          innerObj = innerObj[pathArray[j]];
+        }
+        delete innerObj[item.key];
+      }
       // deleting from render objects...
-      const renderList = this.get('renderList');
-      this._removeFromRenderObj(item, renderList);
+      obj.removeObject(item);
     },
 
-    addKey(obj, newKey){
-      if(obj[0]){
-        const tmp = obj[0];
-        let item = {
-          path: tmp.path,
-          isNotObject:true,
-          key:newKey
-        };
-        for(let i=0;i<this.get('numberOfObjects');i++){
-          item['value'+i] = 'value';
-        }
-        obj.pushObject(item);
-        for(let i=0;i<this.get('numberOfObjects');i++){
-          this.send('save',item,i,'value');
-        }
+    addKey(node, newKey){
+      let value = [];
+      for(let i=0;i<this.get('numberOfFiles');i++){
+        value.pushObject('value');
+      }
+      let item = {
+        isLeaf:true,
+        key:newKey,
+        value:value
+      };
+      node.children.pushObject(item);
+      for(let i=0;i<this.get('numberOfFiles');i++){
+        this.send('save', node.path, item, i, 'value');
       }
     }
   }

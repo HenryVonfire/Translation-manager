@@ -1,57 +1,46 @@
-<b>{{path}}</b><br>
-<form class="form-inline">
-  <div class="form-group">
-    {{one-way-input
-    class="form-control input-medium"
-    value=newKey
-    update=(action (mut newKey))}}
-  </div>
-  <div class="form-group">
-     <button class="btn btn-flat btn-primary"{{action 'addKey' obj newKey}}>+</button>
-  </div>
-</form>
 {{#each obj as |item|}}
-  {{#if item.isNotObject}}
+  {{#if item.isLeaf}}
+  {{!Leaf...}}
     <form class="form-inline">
       <div class="form-group">
         {{one-way-input
         class="form-control input-medium"
         value=item.key
-        update=(action 'save' item -1)}}
+        update=(action 'save' path item -1)}}
       </div>
-      {{#if item.value0}}
-      <div class="form-group">
-        {{one-way-input
-        class="form-control input-medium"
-        value=item.value0
-        update=(action 'save' item 0)}}
+      {{#each item.value as |val index|}}
+        <div class="form-group">
+          {{one-way-input
+          class="form-control input-medium"
+          value=val
+          update=(action 'save' path item index)}}
         </div>
-      {{/if}}
-      {{#if item.value1}}
+      {{/each}}
       <div class="form-group">
-        {{one-way-input
-        class="form-control input-medium"
-        value=item.value1
-        update=(action 'save' item 1)}}
-        </div>
-      {{/if}}
-      {{#if item.value2}}
-      <div class="form-group">
-        {{one-way-input
-        class="form-control input-medium"
-        value=item.value2
-        update=(action 'save' item 2)}}
-        </div>
-      {{/if}}
-
-      <div class="form-group">
-         <button class="btn btn-flat btn-danger"{{action 'removeKey' obj item}}>-</button>
+         <button class="btn btn-flat btn-danger"{{action 'removeKey' path obj item}}>-</button>
       </div>
     </form>
   {{else}}
-    {{obj-new-render obj=item
-    save=(action 'save')
-    removeKey=(action 'removeKey')
-    addKey=(action 'addKey')}}<br>
+  {{!Node...}}
+    <div class="marginado">
+    <b>{{short-path item.path}}</b><br>
+    <form class="form-inline">
+      <div class="form-group">
+        {{one-way-input
+        class="form-control input-medium"
+        value=newKey
+        update=(action (mut newKey))}}
+      </div>
+      <div class="form-group">
+         <button class="btn btn-flat btn-primary"{{action 'addKey' item newKey}}>+</button>
+      </div>
+    </form>
+    {{obj-new-render
+      path=item.path
+      obj=item.children
+      save=(action 'save')
+      removeKey=(action 'removeKey')
+      addKey=(action 'addKey')}}
+  </div>
   {{/if}}
 {{/each}}
