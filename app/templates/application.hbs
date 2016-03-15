@@ -2,22 +2,12 @@
 <button class="btn btn-flat btn-primary" {{action 'saveFile'}}>Save</button>
 <hr>
 
-{{!#each objectList as |obj index|}}
-
-    {{!obj-render
-      obj=obj
-      objectIndex=index
-      save=(action 'save')
-      removeKey=(action 'removeKey')
-      addKey=(action 'addKey')}}
-
-{{!/each}}
-
 {{#if renderList}}
 <div class="file-render">
   {{obj-new-render
     obj=renderList
     save=(action 'save')
-    removeKey=(action 'removeKey')}}
+    removeKey=(action 'removeKey')
+    addKey=(action 'addKey')}}
 </div>
 {{/if}}

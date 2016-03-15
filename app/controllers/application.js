@@ -28,7 +28,6 @@ export default Ember.Controller.extend({
           let item = {
             path: path,
             isNotObject:true,
-            isDirty:false,
             key:i
           };
           for(var j = 0; j < obj.length; j++){
@@ -46,21 +45,16 @@ export default Ember.Controller.extend({
     this.set('renderList',newObj);
   },
 
-  _removeFromRenderObj(item){
-    /*const renderList = this.get('renderList');
-    let tmp = [];
-    const length = renderList.length;
-    for(let i=0;i<length;i++){
-      tmp.pushObject(renderList[i]);
-    }
-    while(tmp[objectIndex].indexOf(item) !== -1){
-
-    }
-    if(renderList[objectIndex].indexOf(item) !== -1){
-
-    } else {
-
-    }*/
+  _removeFromRenderObj(item, list){
+    list.forEach(element => {
+      if(!element.isNotObject){
+        if(element.indexOf(item) !== -1){
+          element.removeObject(item);
+        } else {
+          this._removeFromRenderObj(item, element);
+        }
+      }
+    });
   },
 
   _removeFromOriginalObj(pathArray, item){
@@ -84,6 +78,7 @@ export default Ember.Controller.extend({
         filters: filter
       };*/
       const fileList = dialog.showOpenDialog({ properties: [ 'openFile', 'multiSelections' ]});
+
       if(fileList){
         this.set('fileList',fileList);
         let objectList = [];
@@ -93,6 +88,7 @@ export default Ember.Controller.extend({
           objectList.pushObject(jsonObject);
         });
         this._convertIntoSpecialObject(objectList);
+        this.set('objectList', objectList);
       }
     },
 
@@ -111,32 +107,53 @@ export default Ember.Controller.extend({
     },
 
     // OBJECT ACTIONS...........................................................
-    save(item,newValue){
+    save(item,objectIndex,newValue){
       const pathArray = item.path.split('.');
-      let obj = this.get('objectList')[objectIndex];
-      for(let i=0;i<pathArray.length;i++){
-        obj = obj[pathArray[i]];
+      if(objectIndex === -1){
+        let obj = this.get('objectList');
+        obj.forEach(element => {
+          for(let i=0;i<pathArray.length;i++){
+            element = element[pathArray[i]];
+          }
+          const tmp = element[item.key];
+          delete element[item.key];
+          element[newValue] = tmp;
+        });
+        Ember.set(item,'key',newValue);
+      } else {
+        let obj = this.get('objectList')[objectIndex];
+        for(let i=0;i<pathArray.length;i++){
+          obj = obj[pathArray[i]];
+        }
+        obj[item.key] = newValue;
+        Ember.set(item,'value',newValue);
       }
-      obj[item.key] = newValue;
-      Ember.set(item,'value',newValue);
     },
 
     removeKey(item){
       // deleting from original objects...
       this._removeFromOriginalObj(item.path.split('.'), item);
       // deleting from render objects...
-      this._removeFromRenderObj(item, objectIndex);
+      const renderList = this.get('renderList');
+      this._removeFromRenderObj(item, renderList);
     },
-    addKey(path, key, inputValue){
-      let pathArray, obj=this.get('objectList')[objectIndex];
-      if(path){
-        pathArray = path.split('.');
-        for(let i=0;i<pathArray.length;i++){
-          obj = obj[pathArray[i]];
+
+    addKey(obj, newKey){
+      if(obj[0]){
+        const tmp = obj[0];
+        let item = {
+          path: tmp.path,
+          isNotObject:true,
+          key:newKey
+        };
+        for(let i=0;i<this.get('numberOfObjects');i++){
+          item['value'+i] = 'value';
+        }
+        obj.pushObject(item);
+        for(let i=0;i<this.get('numberOfObjects');i++){
+          this.send('save',item,i,'value');
         }
       }
-      obj = obj[key];
-      obj[inputValue] = '';
     }
   }
 });
