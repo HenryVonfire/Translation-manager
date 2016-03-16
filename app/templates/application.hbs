@@ -3,8 +3,17 @@
   <button class="btn btn-flat btn-warning" {{action 'openFile'}}>Open File</button>
   <button class="btn btn-flat btn-primary" {{action 'saveFile'}}>Save</button>
 </div>
-
-
+<br>
+{{#if fileList}}
+<div class="title">
+keys
+</div>
+{{#each fileOrder as |file|}}
+<div class="title">
+{{file}}
+</div>
+{{/each}}
+{{/if}}
 </div>
 <br><br><br>
 

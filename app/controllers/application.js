@@ -9,6 +9,17 @@ export default Ember.Controller.extend({
     return this.get('objectList').length;
   }),
 
+  fileOrder: Ember.computed('fileList',function() {
+    const fileList = this.get('fileList');
+    let list = [];
+    if(fileList){
+      fileList.forEach(item => {
+        list.pushObject(item.split('/')[item.split('/').length-1]);
+      });
+    }
+    return list;
+  }),
+
   _conversor(obj, path){
     let newObj = [];
     let numberOfFiles = obj.length;

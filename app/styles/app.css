@@ -1,6 +1,6 @@
 .file-render{
   overflow-x: auto;
-  width: 1300px;
+  width: 100%;
   display: inline-block;
 }
 .marginado{
@@ -18,4 +18,12 @@
    z-index: 9999;
    width: 100%;
    background-color: #dddddd;
+}
+
+.title{
+  display: inline-block;
+  width: 180px;
+  padding-left: 65px;
+  background-color: antiquewhite;
+  border-bottom: 1px solid black;
 }
